@@ -1,12 +1,14 @@
 package com.ms.ms_user.service;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
 
 import com.ms.ms_user.dtos.UserRequestDTO;
 import com.ms.ms_user.dtos.UserResponseDTO;
 import com.ms.ms_user.models.User;
 import com.ms.ms_user.repositories.UserRepository;
 
+@Service
 public class UserService {
 
     final UserRepository userRepository;
