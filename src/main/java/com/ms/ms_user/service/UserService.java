@@ -26,4 +26,12 @@ public class UserService {
         BeanUtils.copyProperties(userData, userDataToReturn);
         return userDataToReturn;
     }
+
+    public UserResponseDTO saveNewUser(UserRequestDTO userData) {
+        User userToSave = toEntity(userData);
+        UserResponseDTO userDataToReturn = toDTO(userToSave);
+        userRepository.save(userToSave);
+
+        return userDataToReturn;
+    }
 }
