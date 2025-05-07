@@ -38,6 +38,8 @@ public class UserService {
         UserResponseDTO userDataToReturn = toDTO(userToSave);
         userRepository.save(userToSave);
 
+        userProducer.publishEmailMessage(userData);
+
         return userDataToReturn;
     }
 }
