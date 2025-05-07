@@ -9,6 +9,8 @@ import com.ms.ms_user.models.User;
 import com.ms.ms_user.producers.UserProducer;
 import com.ms.ms_user.repositories.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class UserService {
 
@@ -33,6 +35,7 @@ public class UserService {
         return userDataToReturn;
     }
 
+    @Transactional
     public UserResponseDTO saveNewUser(UserRequestDTO userData) {
         User userToSave = toEntity(userData);
         UserResponseDTO userDataToReturn = toDTO(userToSave);
