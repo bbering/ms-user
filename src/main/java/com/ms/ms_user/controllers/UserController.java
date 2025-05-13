@@ -11,6 +11,11 @@ import com.ms.ms_user.dtos.UserRequestDTO;
 import com.ms.ms_user.dtos.UserResponseDTO;
 import com.ms.ms_user.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RestController
@@ -24,6 +29,11 @@ public class UserController {
     }
 
     @PostMapping
+    @Operation(summary = "Cria um novo usuário", description = "Cria um usuário com os dados fornecidos e retorna os dados criados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content)
+    })
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid UserRequestDTO userData) {
         UserResponseDTO userDataToReturn = userService.saveNewUser(userData);
         return new ResponseEntity<>(userDataToReturn, HttpStatus.CREATED);
