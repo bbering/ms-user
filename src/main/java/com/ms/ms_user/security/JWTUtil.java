@@ -29,12 +29,22 @@ public class JWTUtil {
     }
 
     // gerar o token
-    public String generateToken(String username){
+    public String generateToken(String username) {
         return Jwts.builder()
-        .setSubject(username)
-        .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-        .signWith(key, SignatureAlgorithm.HS256)
-        .compact();
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Há algo de errado com o token " + e.getMessage());
+        }
+        return false;
     }
 }
