@@ -37,6 +37,13 @@
     <version>2.8.6</version>
 </dependency>
 
+<!-- adicionada dependencia do spring security para autenticar -->
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-core</artifactId>
+    <version>6.4.5</version>
+</dependency>
+
 	<!-- adicionada dependencia do lombok para redução de código boilerplate -->
 	<dependency>
     <groupId>org.projectlombok</groupId>
