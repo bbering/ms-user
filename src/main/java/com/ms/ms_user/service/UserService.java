@@ -1,6 +1,11 @@
 package com.ms.ms_user.service;
 
+import java.util.Collections;
+
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ms.ms_user.dtos.UserRequestDTO;
@@ -12,7 +17,7 @@ import com.ms.ms_user.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     final UserRepository userRepository;
 
@@ -44,5 +49,19 @@ public class UserService {
         userProducer.publishEmailMessage(userData);
 
         return userDataToReturn;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User userToFind = userRepository.findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return new org.springframework.security.core.userdetails.User(
+                userToFind.getName(),
+                userToFind.getEmail(),
+                Collections.emptyList());
     }
 }
