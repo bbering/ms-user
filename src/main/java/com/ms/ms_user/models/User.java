@@ -32,4 +32,7 @@ public class User implements Serializable {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "password", nullable = false)
+    private String password;
 }
