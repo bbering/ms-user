@@ -62,6 +62,7 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 userToFind.getName(),
                 userToFind.getEmail(),
+                // campo onde será adicionado o get da senha
                 Collections.emptyList());
     }
 }
