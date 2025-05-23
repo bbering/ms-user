@@ -4,8 +4,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.ms.ms_user.service.UserService;
 
@@ -16,9 +20,17 @@ public class WebSecurityConfig {
 
     final AuthEntryPoint authEntryPoint;
 
-    public WebSecurityConfig(UserService userService, AuthEntryPoint authEntryPoint) {
+    final JWTUtil jwtUtil;
+
+    public WebSecurityConfig(UserService userService, AuthEntryPoint authEntryPoint, JWTUtil jwtUtil) {
         this.userService = userService;
         this.authEntryPoint = authEntryPoint;
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Bean
+    public AuthTokenFilter authJWTTokenFilter() {
+        return new AuthTokenFilter(jwtUtil, userService);
     }
 
     @Bean
@@ -29,6 +41,22 @@ public class WebSecurityConfig {
     @Bean
     public PasswordEncoder passEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
+                .sessionManagement(
+                        sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/api/auth/**", "/api/test/all").permitAll()
+                        .anyRequest().authenticated());
+
+        http.addFilterBefore(authJWTTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
 }
