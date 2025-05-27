@@ -1,13 +1,11 @@
 package com.ms.ms_user.controllers;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ms.ms_user.dtos.UserRequestDTO;
-import com.ms.ms_user.dtos.UserResponseDTO;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,7 +37,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<UserResponseDTO> authUser(@Valid @RequestBody UserRequestDTO user) {
+    public String authUser(@Valid @RequestBody UserRequestDTO user) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getName(),
