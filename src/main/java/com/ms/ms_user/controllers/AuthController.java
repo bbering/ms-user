@@ -46,4 +46,9 @@ public class AuthController {
         return jwtUtil.generateToken(userDetails.getUsername());
     }
 
+    @PostMapping("/signup")
+    public String registerUser(@RequestBody UserRequestDTO user) {
+        //
+    }
+
 }
