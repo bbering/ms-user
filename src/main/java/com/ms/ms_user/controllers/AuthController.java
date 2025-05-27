@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ms.ms_user.dtos.UserRequestDTO;
 import com.ms.ms_user.dtos.UserResponseDTO;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.ms.ms_user.repositories.UserRepository;
 import com.ms.ms_user.security.JWTUtil;
 
@@ -36,8 +39,13 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<UserResponseDTO> authUser(@Valid @RequestBody UserRequestDTO user){
-        //
+    public ResponseEntity<UserResponseDTO> authUser(@Valid @RequestBody UserRequestDTO user) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        user.getName(),
+                        user.getPassword()));
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return jwtUtil.generateToken(userDetails.getUsername());
     }
 
 }
