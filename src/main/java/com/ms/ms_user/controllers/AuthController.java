@@ -1,54 +1,55 @@
 package com.ms.ms_user.controllers;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+import org.springframework.validation.annotation.Validated;
 
 import com.ms.ms_user.dtos.UserRequestDTO;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import com.ms.ms_user.repositories.UserRepository;
+import com.ms.ms_user.dtos.UserResponseDTO;
+import com.ms.ms_user.service.UserService;
 import com.ms.ms_user.security.JWTUtil;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
+@Validated
 public class AuthController {
 
-    final AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final JWTUtil jwtUtil;
 
-    final UserRepository userRepository;
-
-    final PasswordEncoder passEncoder;
-
-    final JWTUtil jwtUtil;
-
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository,
-            PasswordEncoder passwordEncoder, JWTUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.passEncoder = passwordEncoder;
+    public AuthController(UserService userService, JWTUtil jwtUtil) {
+        this.userService = userService;
         this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/signin")
-    public String authUser(@Valid @RequestBody UserRequestDTO user) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getName(),
-                        user.getPassword()));
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return jwtUtil.generateToken(userDetails.getUsername());
+    public ResponseEntity<?> authUser(@Valid @RequestBody UserRequestDTO user) {
+        try {
+            String username = userService.authenticate(user);
+            String token = jwtUtil.generateToken(username);
+            return ResponseEntity.ok().body(new TokenResponseDTO(token));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos.");
+        }
     }
 
     @PostMapping("/signup")
-    public String registerUser(@RequestBody UserRequestDTO user) {
-        //
+    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRequestDTO user) {
+        UserResponseDTO userResponse = userService.saveNewUser(user);
+        return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
+    public static class TokenResponseDTO {
+        private final String token;
+
+        public TokenResponseDTO(String token) {
+            this.token = token;
+        }
+
+        public String getToken() {
+            return token;
+        }
+    }
 }
