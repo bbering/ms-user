@@ -1,6 +1,8 @@
 package com.ms.ms_user.controllers;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -16,11 +18,13 @@ import jakarta.validation.Valid;
 @Validated
 public class AuthController {
 
-    private final UserService userService;
+    @Autowired
+    @Lazy
+    private UserService userService;
+    
     private final JWTUtil jwtUtil;
 
-    public AuthController(UserService userService, JWTUtil jwtUtil) {
-        this.userService = userService;
+    public AuthController(JWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 
