@@ -3,6 +3,7 @@ package com.ms.ms_user.service;
 import java.util.Collections;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +29,8 @@ public class UserService implements UserDetailsService {
 
     private final AuthenticationManager authenticationManager;
 
-    public UserService(UserRepository userRepository, UserProducer userProducer, AuthenticationManager authManager) {
+    // injeção com a tag @Lazy para evitar ciclo de dependencias
+    public UserService(UserRepository userRepository, UserProducer userProducer, @Lazy AuthenticationManager authManager) {
         this.authenticationManager = authManager;
         this.userProducer = userProducer;
         this.userRepository = userRepository;
@@ -78,7 +80,6 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 userToFind.getName(),
                 userToFind.getEmail(),
-                // campo onde será adicionado o get da senha
                 Collections.emptyList());
     }
 }
