@@ -3,7 +3,10 @@ package com.ms.ms_user.service;
 import java.util.Collections;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,10 @@ public class UserService implements UserDetailsService {
 
     final UserProducer userProducer;
 
-    public UserService(UserRepository userRepository, UserProducer userProducer) {
+    private final AuthenticationManager authenticationManager;
+
+    public UserService(UserRepository userRepository, UserProducer userProducer, AuthenticationManager authManager) {
+        this.authenticationManager = authManager;
         this.userProducer = userProducer;
         this.userRepository = userRepository;
     }
@@ -39,6 +45,16 @@ public class UserService implements UserDetailsService {
         BeanUtils.copyProperties(userData, userDataToReturn);
         return userDataToReturn;
     }
+
+    // metodo auxiliar para ser utilizado no processo de autenticação
+    public String authenticate(String username, String rawPassword) {
+    Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(username, rawPassword)
+    );
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    return userDetails.getUsername();
+}
+
 
     @Transactional
     public UserResponseDTO saveNewUser(UserRequestDTO userData) {
