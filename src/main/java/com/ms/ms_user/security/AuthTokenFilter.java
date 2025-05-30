@@ -2,6 +2,8 @@ package com.ms.ms_user.security;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,11 +23,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     final JWTUtil jwtUtil;
 
-    final UserService userService;
+    @Autowired
+    @Lazy
+    private UserService userService;
 
-    public AuthTokenFilter(JWTUtil jwtUtil, UserService userService) {
+    public AuthTokenFilter(JWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        this.userService = userService;
     }
 
     @Override
