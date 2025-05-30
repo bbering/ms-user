@@ -27,7 +27,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authUser(@Valid @RequestBody UserRequestDTO user) {
         try {
-            String username = userService.authenticate(user);
+            String username = userService.authenticate(user.getName(), user.getPassword());
             String token = jwtUtil.generateToken(username);
             return ResponseEntity.ok().body(new TokenResponseDTO(token));
         } catch (Exception e) {
