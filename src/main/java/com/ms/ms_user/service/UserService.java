@@ -12,7 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,12 +21,12 @@ public class UserService {
     final UserRepository userRepository;
     final UserProducer userProducer;
     private final AuthenticationManager authenticationManager;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
                        UserProducer userProducer,
                        @Lazy AuthenticationManager authenticationManager,
-                       BCryptPasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userProducer = userProducer;
         this.authenticationManager = authenticationManager;
