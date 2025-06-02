@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ms.ms_user.service.UserService;
+import com.ms.ms_user.service.CustomUserDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,7 +25,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     @Lazy
-    private UserService userService;
+    private CustomUserDetailsService userDetailsService;
 
     public AuthTokenFilter(JWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -38,7 +38,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwtToken = parseJWT(request);
             if (jwtToken != null && jwtUtil.validateToken(jwtToken)) {
                 String username = jwtUtil.getUsernameFromToken(jwtToken);
-                UserDetails userDetails = userService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null,
                         userDetails.getAuthorities());
 
@@ -46,7 +46,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
-            System.out.println("Cannot authenticate");
+            System.out.println("Cannot authenticate: " + e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
@@ -58,5 +58,4 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
 }
