@@ -81,7 +81,7 @@ public class UserService implements UserDetailsService {
         }
 
         return new org.springframework.security.core.userdetails.User(
-                userToFind.getName(),
+                userToFind.getEmail(), // corrigido o campo exigido para efetuar o login, substituindo name por email
                 userToFind.getPassword(),
                 Collections.emptyList());
     }
