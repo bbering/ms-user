@@ -21,7 +21,7 @@ public class AuthController {
     @Autowired
     @Lazy
     private UserService userService;
-    
+
     private final JWTUtil jwtUtil;
 
     public AuthController(JWTUtil jwtUtil) {
@@ -31,7 +31,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authUser(@Valid @RequestBody UserRequestDTO user) {
         try {
-String username = userService.authenticate(user.getEmail(), user.getPassword());
+            String username = userService.authenticate(user.getEmail(), user.getPassword());
 
             String token = jwtUtil.generateToken(username);
             return ResponseEntity.ok().body(new TokenResponseDTO(token));
@@ -41,9 +41,14 @@ String username = userService.authenticate(user.getEmail(), user.getPassword());
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRequestDTO user) {
-        UserResponseDTO userResponse = userService.saveNewUser(user);
-        return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
+    public ResponseEntity<?> registerUser(@RequestBody UserRequestDTO user) {
+        try {
+            UserResponseDTO userResponse = userService.saveNewUser(user);
+            return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email já cadastrado.");
+        }
+
     }
 
     public static class TokenResponseDTO {
