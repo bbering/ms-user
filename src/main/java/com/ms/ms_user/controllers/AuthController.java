@@ -11,11 +11,20 @@ import com.ms.ms_user.dtos.UserResponseDTO;
 import com.ms.ms_user.service.UserService;
 import com.ms.ms_user.security.JWTUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
 @Validated
+@Tag(name = "Authentication", description = "Endpoints for user sign-in and registration")
 public class AuthController {
 
     @Autowired
@@ -28,11 +37,15 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
+    @Operation(summary = "Sign in with email and password", description = "Authenticates the user and returns a JWT token if credentials are valid.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful authentication", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(mediaType = "application/json"))
+    })
     @PostMapping("/signin")
     public ResponseEntity<?> authUser(@Valid @RequestBody UserRequestDTO user) {
         try {
             String username = userService.authenticate(user.getEmail(), user.getPassword());
-
             String token = jwtUtil.generateToken(username);
             return ResponseEntity.ok().body(new TokenResponseDTO(token));
         } catch (Exception e) {
@@ -40,6 +53,11 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Register a new user", description = "Creates a new user with the given email and password.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User successfully registered", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "409", description = "Email already registered", content = @Content(mediaType = "application/json"))
+    })
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody UserRequestDTO user) {
         try {
@@ -48,9 +66,9 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email já cadastrado.");
         }
-
     }
 
+    @Schema(description = "DTO representing the JWT token response")
     public static class TokenResponseDTO {
         private final String token;
 
