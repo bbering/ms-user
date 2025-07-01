@@ -63,8 +63,10 @@ public class AuthController {
         try {
             UserResponseDTO userResponse = userService.saveNewUser(user);
             return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email já cadastrado.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao registrar usuário.");
         }
     }
 
