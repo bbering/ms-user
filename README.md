@@ -81,6 +81,7 @@ mvn spring-boot:run
 ## Observações
 
 - A aplicação deve estar rodando juntamente com o `ms-email`, que estará escutando os eventos publicados pelo RabbitMQ.
+- A aplicação `ms-email` está disponível em: https://github.com/bbering/ms-email
 - Certifique-se de que o `ms-email` está rodando em outra porta (por exemplo, `8080`) e conectado à mesma instância do RabbitMQ (CloudAMQP).
 
 ## Testes
