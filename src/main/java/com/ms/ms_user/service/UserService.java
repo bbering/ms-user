@@ -24,9 +24,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                       UserProducer userProducer,
-                       @Lazy AuthenticationManager authenticationManager,
-                       PasswordEncoder passwordEncoder) {
+            UserProducer userProducer,
+            @Lazy AuthenticationManager authenticationManager,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userProducer = userProducer;
         this.authenticationManager = authenticationManager;
@@ -47,8 +47,7 @@ public class UserService {
 
     public String authenticate(String username, String rawPassword) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, rawPassword)
-        );
+                new UsernamePasswordAuthenticationToken(username, rawPassword));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return userDetails.getUsername();
     }
@@ -56,9 +55,16 @@ public class UserService {
     @Transactional
     public UserResponseDTO saveNewUser(UserRequestDTO userData) {
         User userToSave = toEntity(userData);
-        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
+
+        if (userData.getPassword() == null || userData.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password não pode ser nulo ou vazio");
+        }
+
+        userToSave.setPassword(passwordEncoder.encode(userData.getPassword()));
+
         userRepository.save(userToSave);
         userProducer.publishEmailMessage(userData);
         return toDTO(userToSave);
     }
+
 }
