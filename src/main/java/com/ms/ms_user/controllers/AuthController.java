@@ -17,8 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -59,13 +57,12 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "Email already registered", content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody UserRequestDTO user) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequestDTO user) {
         try {
             UserResponseDTO userResponse = userService.saveNewUser(user);
             return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao registrar usuário.");
         }
     }
